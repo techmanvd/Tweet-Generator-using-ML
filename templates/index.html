@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tweet Generator</title>
+    <title>AI Smart Captioner</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6C63FF;
-            --accent: #00DBDE;
+            --primary: #6366f1;
+            --secondary: #ec4899;
             --bg: #0f172a;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --text: #ffffff;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
         }
 
         body {
@@ -26,209 +27,164 @@
             justify-content: center;
             align-items: center;
             color: var(--text);
-            overflow: hidden;
         }
 
-        .container {
-            text-align: center;
-            width: 90%;
-            max-width: 600px; /* Increased width slightly to fit more buttons */
-        }
+        .container { width: 90%; max-width: 500px; }
 
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            text-align: center;
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            margin-top: 0;
+            font-size: 2rem;
+            margin: 0 0 10px 0;
             background: linear-gradient(90deg, #00DBDE 0%, #FC00FF 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            -webkit-text-fill-color: transparent;
         }
 
-        .subtitle {
-            color: #94a3b8;
-            margin-bottom: 25px;
-            font-weight: 300;
-            font-size: 0.9rem;
-        }
+        .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px; }
 
-        /* TOPIC SELECTOR STYLES */
-        .topic-selector {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap; /* Allows buttons to wrap to next line */
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .topic-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #94a3b8;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .topic-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Active State for Topics */
-        .topic-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(108, 99, 255, 0.4);
-        }
-
-        .tweet-box {
+        textarea {
+            width: 100%;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            resize: none;
+            height: 100px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus { outline: none; border-color: var(--secondary); }
+
+        .result-area {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
             padding: 20px;
+            position: relative;
             min-height: 80px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
+            align-items: center;
         }
 
-        .tweet-text {
-            font-size: 1.2rem;
-            line-height: 1.5;
-            color: #e2e8f0;
-        }
-
-        .tweet-text.fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        button.generate-btn {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border: none;
-            padding: 16px 32px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 15px -3px rgba(108, 99, 255, 0.3);
-            width: 100%;
+        .mood-badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        button.generate-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 25px -5px rgba(108, 99, 255, 0.5);
-        }
-
-        button.generate-btn:active {
-            transform: scale(0.98);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .loader {
+            margin-bottom: 10px;
             display: none;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid var(--accent);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .caption-text { font-size: 1.2rem; line-height: 1.4; font-weight: 500; }
+
+        button.gen-btn {
+            margin-top: 20px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 15px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button.gen-btn:hover { transform: translateY(-2px); }
+        button.gen-btn:active { transform: scale(0.98); }
+
+        .copy-icon {
+            position: absolute; top: 10px; right: 10px;
+            color: #94a3b8; cursor: pointer;
+        }
+        .copy-icon:hover { color: white; }
+
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="card">
-            <h1>AI Tweeter</h1>
-            <p class="subtitle">Select a topic & generate</p>
+            <h1>AI Tweet Generator</h1>
+            <p class="subtitle">Type your thought, get a perfect caption.</p>
 
-            <div class="topic-selector">
-                <button class="topic-btn active" onclick="setTopic('tech', this)">Tech</button>
-                <button class="topic-btn" onclick="setTopic('business', this)">Business</button>
-                <button class="topic-btn" onclick="setTopic('philosophy', this)">Philosophy</button>
-                <button class="topic-btn" onclick="setTopic('physics', this)">Physics</button>
-                <button class="topic-btn" onclick="setTopic('astronomy', this)">Astronomy</button>
-                <button class="topic-btn" onclick="setTopic('geopolitics', this)">Geopolitics</button>
+            <textarea id="userInput" placeholder="Ex: I am coding a new project... OR I love looking at the stars..."></textarea>
+
+            <div class="result-area">
+                <i class="fa-regular fa-copy copy-icon" onclick="copyText()" title="Copy"></i>
+                <div id="moodBadge" class="mood-badge">Neutral</div>
+                <div id="captionOutput" class="caption-text">Your generated tweet will appear here...</div>
             </div>
 
-            <div class="tweet-box">
-                <div class="loader" id="loader"></div>
-                <div class="tweet-text" id="tweetOutput">Select a topic and click generate!</div>
-            </div>
-
-            <button class="generate-btn" onclick="generateTweet()">Generate Tweet</button>
+            <button class="gen-btn" onclick="generateCaption()">Generate Tweet</button>
         </div>
     </div>
 
     <script>
-        // Default topic
-        let currentTopic = 'tech';
+        async function generateCaption() {
+            const input = document.getElementById('userInput').value;
+            const output = document.getElementById('captionOutput');
+            const badge = document.getElementById('moodBadge');
 
-        function setTopic(topic, btnElement) {
-            currentTopic = topic;
-            
-            // Remove 'active' class from all buttons
-            document.querySelectorAll('.topic-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            if (!input.trim()) {
+                output.innerText = "Please type a thought first!";
+                return;
+            }
 
-            // Add 'active' class to clicked button
-            btnElement.classList.add('active');
-        }
-
-        async function generateTweet() {
-            const output = document.getElementById('tweetOutput');
-            const loader = document.getElementById('loader');
-            
-            output.style.display = 'none';
-            loader.style.display = 'block';
+            output.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+            badge.style.display = 'none';
 
             try {
-                const response = await fetch(`/generate_tweet?topic=${currentTopic}`);
+                const response = await fetch('/generate_caption', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ thought: input })
+                });
+
                 const data = await response.json();
 
-                setTimeout(() => {
-                    output.innerText = data.tweet;
-                    loader.style.display = 'none';
-                    output.style.display = 'block';
-                    
-                    output.classList.remove('fade-in');
-                    void output.offsetWidth; 
-                    output.classList.add('fade-in');
-                }, 300);
+                output.innerText = data.caption;
+                badge.innerText = data.detected_mood + " MODE";
+                badge.style.display = 'inline-block';
+                
+                // Trigger Animation
+                output.classList.remove('fade-in');
+                void output.offsetWidth; 
+                output.classList.add('fade-in');
 
             } catch (error) {
-                console.error('Error:', error);
-                loader.style.display = 'none';
-                output.style.display = 'block';
-                output.innerText = "Connection Error!";
+                console.error(error);
+                output.innerText = "Error connecting to AI.";
+            }
+        }
+
+        function copyText() {
+            const text = document.getElementById('captionOutput').innerText;
+            if(text && text !== "Your generated tweet will appear here...") {
+                navigator.clipboard.writeText(text);
+                alert("Tweet Copied!");
             }
         }
     </script>
